@@ -26,9 +26,9 @@
             <td>{{ product.quantity }}</td>
             <td>{{ category_name }}</td>
             <td>
-                <a href="{{ url_for('main.edit_product', product_id=product.id) }}"
+                <a href="{{ url_for('admin.edit_product', product_id=product.id) }}"
                    class="btn btn-sm btn-success d-block mb-1">Изменить</a>
-                <a href="{{ url_for('main.delete_product', product_id=product.id) }}" class="btn btn-sm btn-danger d-block">Удалить</a>
+                <a href="{{ url_for('admin.delete_product', product_id=product.id) }}" class="btn btn-sm btn-danger d-block">Удалить</a>
             </td>
         </tr>
         {% endfor %}
@@ -36,7 +36,7 @@
     </table>
 
     <h2>Добавить товар</h2>
-    <form method="POST" class="mb-5" action="{{ url_for('main.add_product') }}" enctype="multipart/form-data">
+    <form method="POST" class="mb-5" action="{{ url_for('admin.add_product') }}" enctype="multipart/form-data">
         <!-- Input fields for name, description, price, image_url -->
         <div class="form-group">
             <div class="mb-3" style="width: 300px;">
@@ -92,8 +92,8 @@
             </td>
             <td>{{ category.name }}</td>
             <td>
-                <a href="{{ url_for('main.edit_category', category_id=category.id) }}" class="btn btn-sm btn-success">Изменить</a>
-                <a href="{{ url_for('main.delete_category', category_id=category.id) }}" class="btn btn-sm btn-danger">Удалить</a>
+                <a href="{{ url_for('admin.edit_category', category_id=category.id) }}" class="btn btn-sm btn-success">Изменить</a>
+                <a href="{{ url_for('admin.delete_category', category_id=category.id) }}" class="btn btn-sm btn-danger">Удалить</a>
             </td>
         </tr>
         {% endfor %}
@@ -101,7 +101,7 @@
     </table>
 
     <h3>Добавить новую категорию</h3>
-    <form method="POST" class="pb-5" action="{{ url_for('main.add_category') }}" enctype="multipart/form-data">
+    <form method="POST" class="pb-5" action="{{ url_for('admin.add_category') }}" enctype="multipart/form-data">
          <div class="form-group" style="width: 300px;">
                 <label for="category_file" class="form-label">Изображение категории</label>
                 <input type="file" name="file" class="form-control" id="category_file">
