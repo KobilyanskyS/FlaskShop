@@ -1,4 +1,5 @@
 import os
+import json
 from flask import Blueprint, render_template, request, redirect, url_for, abort
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
@@ -57,16 +58,49 @@ def add_category():
     return redirect(url_for('admin.manage_products'))
 
 
-@admin.route('/shop_admin/categories/edit')
+@admin.route('/shop_admin/categories/edit', methods=['POST'])
 @login_required
 def edit_category():
-    return "Хуй"
+    if not current_user.is_admin:
+        abort(403)
+
+    category_id = request.form.get('update_category_id')
+    category = Category.query.get_or_404(category_id)
+
+    name = request.form.get('update_category_name')
+    main_category = request.form.get('update_category_main_category')
+
+    if 'file' in request.files:
+        new_image_url = save_file(folder="./project/static/categories/", file=request.files['file'])
+        if new_image_url:
+            category.image_url = new_image_url
+
+    if main_category != '':
+        category.main_category = main_category
+
+    category.name = name
+
+    db.session.commit()
+    return redirect(url_for('admin.manage_products'))
 
 
-@admin.route('/shop_admin/categories/delete')
+@admin.route('/shop_admin/categories/delete', methods=['POST'])
 @login_required
 def delete_category():
-    return "Хуй2"
+    if not current_user.is_admin:
+        abort(403)
+    category_id = request.form.get('category_id')
+    category = Category.query.get_or_404(category_id)
+
+    f = category.image_url
+
+    if f != '/static/categories/default_category.png':
+        os.remove('./project'+f)
+
+    db.session.delete(category)
+    db.session.commit()
+
+    return redirect(url_for('admin.manage_products'))
 
 
 @admin.route('/shop_admin/products')
@@ -77,8 +111,38 @@ def manage_products():
     products = db.session.query(Product, Category.name) \
         .join(Category, Product.category_id == Category.id) \
         .all()
+
+    # Преобразуем данные в JSON
+    products_json = json.dumps([
+        {
+            "id": product.id,
+            "name": product.name,
+            "description": product.description,
+            "price": product.price,
+            "quantity": product.quantity,
+            "category_name": category_name,
+            "image_url": product.image_url
+        } for product, category_name in products
+    ])
+
     categories = get_categories_hierarchically()
-    return render_template('manage_products.html', products=products, categories=categories, name=current_user.name)
+    categories_json = json.dumps([
+        {
+            "id": category.id,
+            "name": category.name,
+            "level": category.level,
+            "main_category": category.main_category,
+            "image_url": category.image_url
+        } for category in categories
+    ])
+
+    return render_template(
+        'manage_products.html',
+        products_json=products_json,
+        categories_json=categories_json,
+        name=current_user.name,
+        categories=categories
+    )
 
 
 def get_categories_hierarchically(parent_id=None, level=0):
@@ -91,16 +155,53 @@ def get_categories_hierarchically(parent_id=None, level=0):
     return result
 
 
-@admin.route('/shop_admin/products/edit')
+@admin.route('/shop_admin/products/edit', methods=['POST'])
 @login_required
 def edit_product():
-    return "Хуй3"
+    if not current_user.is_admin:
+        abort(403)
+
+    product_id = request.form.get('update_product_id')
+    product = Product.query.get_or_404(product_id)
+
+    name = request.form.get('update_product_name')
+    description = request.form.get('update_product_description')
+    price = request.form.get('update_product_price')
+    quantity = request.form.get('update_product_quantity')
+    category_id = request.form.get('update_product_category_name')
+
+    if 'file' in request.files:
+        new_image_url = save_file(folder="./project/static/products/", file=request.files['file'])
+        if new_image_url:
+            product.image_url = new_image_url
+
+    product.name = name
+    product.description = description
+    product.price = price
+    product.quantity = quantity
+    product.category_id = category_id
+
+    db.session.commit()
+    return redirect(url_for('admin.manage_products'))
 
 
-@admin.route('/shop_admin/products/delete')
+@admin.route('/shop_admin/products/delete', methods=['POST'])
 @login_required
 def delete_product():
-    return "Хуй4"
+    if not current_user.is_admin:
+        abort(403)
+    product_id = request.form.get('product_id')
+    product = Product.query.get_or_404(product_id)
+
+    f = product.image_url
+
+    if f != '/static/products/default_product.png':
+        os.remove('./project'+f)
+
+    db.session.delete(product)
+    db.session.commit()
+
+    return redirect(url_for('admin.manage_products'))
 
 
 @admin.route('/shop_admin/products/add', methods=['POST'])

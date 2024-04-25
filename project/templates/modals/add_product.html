@@ -1,0 +1,56 @@
+<!-- Добавление товара -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Добавление товара</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('admin.add_product') }}" enctype="multipart/form-data">
+                <!-- Input fields for name, description, price, image_url -->
+                <div class="modal-body">
+
+
+                    <div class="form-group">
+                        <div class="mb-3" style="width: 300px;">
+                            <label for="file" class="form-label">Изображение товара</label>
+                            <input type="file" name="file" class="form-control" id="file">
+                        </div>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Название товара</label>
+                            <input type="text" class="form-control" name="name" id="name">
+                            <label for="description" class="form-label">Описание товара</label>
+                            <textarea class="form-control" name="description" id="description" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Цена товара</label>
+                            <input type="text" class="form-control" name="price" id="price">
+                        </div>
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label">Количество товара</label>
+                            <input type="text" class="form-control" name="quantity" id="quantity">
+                        </div>
+                        <div class="mb-3">
+                            <label for="category">Категория:</label>
+                            <select name="category_id" id="category" class="form-control">
+                                {% for category in categories %}
+                                <option value="{{ category.id }}">{{ '-' * category.level }} {{ category.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer category-footer">
+                    <p id="categoryError"></p>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary" id="addProductId">Добавить товар</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

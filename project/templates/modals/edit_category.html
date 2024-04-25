@@ -1,0 +1,35 @@
+<!-- Изменение категории -->
+<div class="modal fade" id="updateCategoryModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Изменение категории</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('admin.edit_category') }}" enctype="multipart/form-data">
+                <input type="hidden" name="update_category_id" id="update_category_id">
+                <div class="modal-body">
+                    <div class="form-group" style="width: 300px;">
+                        <img id="update_category_image" src="" alt="" width="40px">
+                        <label for="category_file" class="form-label">Изображение категории</label>
+                        <input type="file" name="file" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="category_name">Название категории:</label>
+                        <input type="text" name="update_category_name" id="update_category_name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="main_category">Главная категория:</label>
+                        <select name="update_category_main_category" id="update_category_main_category" class="form-control">
+
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary mt-2">Добавить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

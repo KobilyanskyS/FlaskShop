@@ -4,7 +4,16 @@
 <div class="container">
 
     <h2>Товары</h2>
-    <table class="table">
+        <div class="input-group">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal">
+            Добавить товар
+        </button>
+        <input type="text" id="productSearch" placeholder="Поиск товаров..." class="form-control">
+        <select id="categoryFilter" class="form-control">
+
+        </select>
+    </div>
+    <table class="table" id="productsTable">
         <thead>
         <tr>
             <th>Фото</th>
@@ -16,67 +25,20 @@
         </tr>
         </thead>
         <tbody>
-        {% for product, category_name in products %}
-        <tr>
-            <td>
-                <img width="40px" src="{{ product.image_url }}" alt="">
-            </td>
-            <td>{{ product.name }}</td>
-            <td>{{ product.price }}</td>
-            <td>{{ product.quantity }}</td>
-            <td>{{ category_name }}</td>
-            <td>
-                <a href="{{ url_for('admin.edit_product', product_id=product.id) }}"
-                   class="btn btn-sm btn-success d-block mb-1">Изменить</a>
-                <a href="{{ url_for('admin.delete_product', product_id=product.id) }}" class="btn btn-sm btn-danger d-block">Удалить</a>
-            </td>
-        </tr>
-        {% endfor %}
+
         </tbody>
     </table>
-
-    <h2>Добавить товар</h2>
-    <form method="POST" class="mb-5" action="{{ url_for('admin.add_product') }}" enctype="multipart/form-data">
-        <!-- Input fields for name, description, price, image_url -->
-        <div class="form-group">
-            <div class="mb-3" style="width: 300px;">
-                <label for="file" class="form-label">Изображение товара</label>
-                <input type="file" name="file" class="form-control" id="file">
-            </div>
-            <div class="mb-3">
-                <label for="name" class="form-label">Название товара</label>
-                <input type="text" class="form-control" name="name"  id="name">
-                <label for="description" class="form-label">Описание товара</label>
-                <textarea class="form-control" name="description" id="description" rows="3"></textarea>
-            </div>
-            <div class="mb-3">
-
-            </div>
-            <div class="mb-3">
-                <label for="price" class="form-label">Цена товара</label>
-                <input type="text" class="form-control" name="price" id="price">
-            </div>
-            <div class="mb-3">
-                <label for="quantity" class="form-label">Количество товара</label>
-                <input type="text" class="form-control" name="quantity" id="quantity">
-            </div>
-            <div class="mb-3">
-                <label for="category">Категория:</label>
-                <select name="category_id" id="category" class="form-control">
-                    {% for category in categories %}
-                    <option value="{{ category.id }}">{{ '-' * category.level }} {{ category.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-        </div>
-        <button type="submit" class="btn btn-primary">Добавить товар</button>
-    </form>
 
 </div>
 <div class="container">
     <h2>Категории</h2>
-    <table class="table">
+    <div class="input-group">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#categoryModal">
+        Добавить категорию
+    </button>
+    <input type="text" id="categorySearch" placeholder="Поиск категорий..." class="form-control">
+    </div>
+    <table class="table" id="categoriesTable">
         <thead>
         <tr>
             <th>Фото</th>
@@ -85,42 +47,23 @@
         </tr>
         </thead>
         <tbody>
-        {% for category in categories %}
-        <tr>
-            <td>
-                <img width="40px" src="{{ category.image_url }}" alt="">
-            </td>
-            <td>{{ category.name }}</td>
-            <td>
-                <a href="{{ url_for('admin.edit_category', category_id=category.id) }}" class="btn btn-sm btn-success">Изменить</a>
-                <a href="{{ url_for('admin.delete_category', category_id=category.id) }}" class="btn btn-sm btn-danger">Удалить</a>
-            </td>
-        </tr>
-        {% endfor %}
+
         </tbody>
     </table>
-
-    <h3>Добавить новую категорию</h3>
-    <form method="POST" class="pb-5" action="{{ url_for('admin.add_category') }}" enctype="multipart/form-data">
-         <div class="form-group" style="width: 300px;">
-                <label for="category_file" class="form-label">Изображение категории</label>
-                <input type="file" name="file" class="form-control" id="category_file">
-         </div>
-        <div class="form-group">
-            <label for="category_name">Название категории:</label>
-            <input type="text" name="name" id="category_name" class="form-control">
-        </div>
-        <div class="form-group">
-            <label for="main_category">Главная категория:</label>
-            <select name="main_category" id="main_category" class="form-control">
-                <option value="">Нет (Верхний уровень)</option>
-                {% for category in categories %}
-                <option value="{{ category.id }}">{{ category.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <button type="submit" class="btn btn-primary mt-2">Добавить</button>
-    </form>
 </div>
+
+{%  include "modals/add_product.html" %}
+{%  include "modals/edit_product.html" %}
+{%  include "modals/delete_product.html" %}
+{%  include "modals/add_category.html" %}
+{%  include "modals/edit_category.html" %}
+{%  include "modals/delete_category.html" %}
+
+<script>
+    const productsData = JSON.parse({{ products_json | tojson }});
+    const categoriesData = JSON.parse({{ categories_json | tojson }});
+</script>
+<script src="/static/js/filter_search_render.js"></script>
+<script src="/static/js/delete_update_categories_and_products.js"></script>
 
 {% endblock %}

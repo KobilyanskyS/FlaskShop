@@ -1,0 +1,21 @@
+<!-- Удаление категории -->
+<div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Удаление категории товара</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <form method="POST" action="{{ url_for('admin.delete_category') }}" enctype="multipart/form-data">
+                <input type="hidden" name="category_id" id="category_id">
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-danger">Удалить категорию</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
