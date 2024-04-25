@@ -1,8 +1,8 @@
 import os
 import json
+import random
 from flask import Blueprint, render_template, request, redirect, url_for, abort
 from flask_login import login_required, current_user
-from werkzeug.utils import secure_filename
 from . import db
 from .models import Product, Category
 
@@ -18,13 +18,23 @@ def allowed_file(filename):
 
 def save_file(folder, file):
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
+        random_name = generate_random_name()
+        _, ext = os.path.splitext(file.filename)
+        filename = f"{random_name}{ext}"
         file_path = os.path.join(folder, filename)
         file.save(file_path)
         relative_path = os.path.relpath(file_path, start=os.path.join(os.getcwd(), 'project'))
         return f"/{relative_path.replace(os.sep, '/')}"
     else:
         return None
+
+
+def generate_random_name():
+    characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+    random_name = ''
+    for i in range(16):
+        random_name += random.choice(characters)
+    return random_name
 
 
 @admin.route('/shop_admin')
