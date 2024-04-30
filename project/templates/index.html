@@ -1,10 +1,46 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 class="title">
-  Flask Login Example
-</h1>
-<h2 class="subtitle">
-  Easy authentication and authorization in Flask.
-</h2>
-{% endblock %}
+
+<button type="button" class="btn btn-outline-dark btn-lg" data-bs-toggle="modal"
+        data-bs-target="#categoriesModalFullscreen">Категории
+</button>
+
+<div class="modal fade" id="categoriesModalFullscreen" aria-labelledby="exampleModalFullscreenLabel">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-4" id="exampleModalFullscreenLabel">Категории</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex flex-wrap align-items-start">
+
+                {% macro render_categories(categories, parent_category=None) %}
+                {% for category in categories %}
+                {% if category.main_category == parent_category %}
+                <li class="m-10">
+                    {% if categories|selectattr("main_category", "==", category.id)|list %}
+                    {{ category.name }}
+                    <ul>
+                        {{ render_categories(categories, category.id) }}
+                    </ul>
+                    {% else %}
+                    <a href="{{ url_for('main.products', category_id=category.id) }}">{{ category.name }}</a>
+                    {% endif %}
+                </li>
+                {% endif %}
+                {% endfor %}
+                {% endmacro %}
+
+
+
+                {{ render_categories(categories) }}
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% endblock %}
