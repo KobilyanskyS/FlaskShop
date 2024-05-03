@@ -1,4 +1,5 @@
 from flask_login import UserMixin
+from sqlalchemy import CheckConstraint
 from . import db
 
 class User(UserMixin, db.Model):
@@ -8,7 +9,6 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(1000))
     created_on = db.Column(db.DateTime, nullable=False)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
-
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -26,14 +26,17 @@ class Category(db.Model):
     name = db.Column(db.String(255), nullable=False, unique=True)
     image_url = db.Column(db.String(255))
 
-class Order(db.Model):
+
+class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    user = db.relationship('User', backref=db.backref('orders', lazy=True))
-    order_date = db.Column(db.DateTime, nullable=False)
-
-class OrderItem(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
+    quantity = db.Column(db.Integer, CheckConstraint('quantity >= 0'))
+
+
+class Order(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    cart_id = db.Column(db.Integer, db.ForeignKey('cart.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    order_date = db.Column(db.DateTime, nullable=False)
+    total_price = db.Column(db.Float)

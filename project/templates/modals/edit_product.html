@@ -18,24 +18,24 @@
                             <input type="file" name="file" class="form-control">
                         </div>
                         <div class="mb-3">
-                            <label for="name" class="form-label">Название товара</label>
+                            <label for="update_product_name" class="form-label">Название товара</label>
                             <input type="text" class="form-control" name="update_product_name" id="update_product_name">
-                            <label for="description" class="form-label">Описание товара</label>
+                            <label for="update_product_description" class="form-label">Описание товара</label>
                             <textarea class="form-control" name="update_product_description" id="update_product_description" rows="3"></textarea>
                         </div>
                         <div class="mb-3">
 
                         </div>
                         <div class="mb-3">
-                            <label for="price" class="form-label">Цена товара</label>
+                            <label for="update_product_price" class="form-label">Цена товара</label>
                             <input type="text" class="form-control" name="update_product_price" id="update_product_price">
                         </div>
                         <div class="mb-3">
-                            <label for="quantity" class="form-label">Количество товара</label>
+                            <label for="update_product_quantity" class="form-label">Количество товара</label>
                             <input type="text" class="form-control" name="update_product_quantity" id="update_product_quantity">
                         </div>
                         <div class="mb-3">
-                            <label for="category">Категория:</label>
+                            <label for="update_product_category_name">Категория:</label>
                             <select name="update_product_category_name" class="form-control" id="">
                                 {% for category in categories %}
                                 <option value="{{ category.id }}">{{ '-' * category.level }} {{ category.name }}

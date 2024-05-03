@@ -63,7 +63,7 @@
     const productsData = JSON.parse({{ products_json | tojson }});
     const categoriesData = JSON.parse({{ categories_json | tojson }});
 </script>
-<script src="/static/js/filter_search_render.js"></script>
-<script src="/static/js/delete_update_categories_and_products.js"></script>
+<script src="{{ url_for('static', filename='js/filter_search_render.js') }}"></script>
+<script src="{{ url_for('static', filename='js/delete_update_categories_and_products.js') }}"></script>
 
 {% endblock %}

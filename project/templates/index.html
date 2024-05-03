@@ -18,7 +18,7 @@
                 {% macro render_categories(categories, parent_category=None) %}
                 {% for category in categories %}
                 {% if category.main_category == parent_category %}
-                <li class="m-10">
+                <li class="m-10" style="list-style-type:none;">
                     {% if categories|selectattr("main_category", "==", category.id)|list %}
                     {{ category.name }}
                     <ul>

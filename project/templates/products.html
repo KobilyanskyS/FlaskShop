@@ -25,14 +25,43 @@
                             <div class="d-flex flex-row align-items-center mb-1">
                                 <h4 class="mb-1 me-1">{{ product.price }}</h4>
                             </div>
-                            <div class="d-flex flex-column mt-4">
-                                <button data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-sm"
-                                        type="button">Подробнее
-                                </button>
+                            <div class="d-flex flex-column mt-4 product_btns" id="product_btns_{{ product.id }}">
+                                {% if current_user.is_authenticated %}
+                                {% if product.id in cart_ids %}
+                                <div class="btn-group" role="group" aria-label="Basic outlined example">
+                                    <button type="button" class="btn btn-outline-primary add_to_cart"
+                                            data-product-id="{{ product.id }}"
+                                            data-btn-type="counter"
+                                            data-btn-val="-1"
+                                            onclick="add_to_cart(this)">-
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary counter"
+                                            id="product_{{ product.id }}">
+                                        {% for items in cart %}
+                                        {% if items.product_id == product.id %}
+                                        {{ items.quantity }}
+                                        {% endif %}
+                                        {% endfor %}
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary add_to_cart"
+                                            data-product-id="{{ product.id }}"
+                                            data-btn-type="counter"
+                                            data-btn-val="1"
+                                            onclick="add_to_cart(this)">+
+                                    </button>
+                                </div>
+                                {% else %}
                                 <button data-mdb-button-init data-mdb-ripple-init
-                                        class="btn btn-outline-primary btn-sm mt-2" type="button">
-                                    Добавить в корзину
+                                        class="btn btn-outline-primary btn-sm mt-2 add_to_cart" type="button"
+                                        data-product-id="{{ product.id }}"
+                                        data-btn-type="default"
+                                        data-btn-val="1"
+                                        onclick="add_to_cart(this)">Добавить в корзину
                                 </button>
+                                {% endif %}
+                                {% else %}
+                                <div><a href="{{ url_for('auth.login') }}">Войдите</a> или <a href="{{ url_for('auth.signup') }}">Зарегистрируйтесь</a></div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -43,6 +72,8 @@
     {% endfor %}
 </div>
 
+<script src="{{ url_for('static', filename='js/jQuery.js') }}"></script>
+<script src="{{ url_for('static', filename='js/add_to_cart.js') }}"></script>
 
 {% endblock %}
 
