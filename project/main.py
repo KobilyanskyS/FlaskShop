@@ -1,8 +1,9 @@
+from datetime import datetime
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
 from flask_login import login_required, current_user
 from .admin import get_categories_hierarchically
 from . import db
-from .models import Product, Category, Cart
+from .models import Product, Category, Cart, Order, OrderItem
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -20,7 +21,10 @@ def index():
 @login_required
 def profile():
     total_price = get_cart_total_price()
-    return render_template('profile.html', name=current_user.name, total_price=total_price)
+    orders = Order.query.filter_by(user_id=current_user.id) \
+        .order_by(Order.order_date.desc()) \
+        .all()
+    return render_template('profile.html', total_price=total_price, orders=orders)
 
 
 @main.route('/products')
@@ -73,6 +77,57 @@ def cart():
         products_in_cart.append(product_data)
 
     return render_template('cart.html', total_price=total_price, cart_items=products_in_cart)
+
+
+@main.route('/order')
+@login_required
+def order():
+    user_id = current_user.id
+    cart_items = Cart.query.filter_by(user_id=user_id).all()
+
+    order_data = []
+    total_price = get_cart_total_price()
+
+    for item in cart_items:
+        product = Product.query.get(item.product_id)  # Получаем данные о товаре
+        item_total_price = product.price * item.quantity  # Рассчитываем стоимость товара с учетом количества
+
+        order_data.append({
+            'product_name': product.name,
+            'product_image_url': product.image_url,
+            'product_price': product.price,
+            'quantity': item.quantity,
+            'item_total_price': item_total_price
+        })
+
+    return render_template('create_order.html', order_data=order_data, total_price=total_price)
+
+
+@main.route('/create_order')
+@login_required
+def create_order():
+    user_id = current_user.id
+    cart_items = Cart.query.filter_by(user_id=user_id).all()
+
+    total_price = get_cart_total_price()
+
+    # 1. Создаем запись в таблице Order
+    order = Order(user_id=user_id, order_date=datetime.utcnow(),
+                  total_price=total_price, status="Заказ создан")
+    db.session.add(order)
+    db.session.flush()  # Чтобы получить id созданного заказа
+
+    # 2. Заносим товары в таблицу OrderItem
+    for item in cart_items:
+        order_item = OrderItem(order_id=order.id, user_id=user_id,
+                              product_id=item.product_id, quantity=item.quantity)
+        db.session.add(order_item)
+
+    Cart.query.filter_by(user_id=user_id).delete()
+
+    db.session.commit()
+
+    return redirect(url_for('main.profile'))
 
 
 @main.route('/_add_item_to_cart', methods=['POST'])

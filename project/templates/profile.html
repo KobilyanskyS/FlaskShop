@@ -1,7 +1,97 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 class="title">
-  Welcome, {{ name }}!
-</h1>
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/5.3.45/css/materialdesignicons.css"
+      integrity="sha256-NAxhqDvtY0l4xn+YVa6WjAcmd94NNfttjNsDmNatFVc=" crossorigin="anonymous"/>
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+<style type="text/css">
+    .avatar-lg {
+    height: 5rem;
+    width: 5rem;
+    }
+
+    .font-size-18 {
+    font-size: 18px!important;
+    }
+
+    .text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    }
+
+    a {
+    text-decoration: none!important;
+    }
+
+    .w-xl {
+    min-width: 160px;
+    }
+
+    .card {
+    margin-bottom: 24px;
+    -webkit-box-shadow: 0 2px 3px #e4e8f0;
+    box-shadow: 0 2px 3px #e4e8f0;
+    }
+
+    .card {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid #eff0f2;
+    border-radius: 1rem;
+    }
+</style>
+
+<div class="container mt-2">
+
+  <h3 class="title">
+  Мои заказы
+</h3>
+
+    <div class="row">
+        <div class="col-xl-6">
+
+          {% for order in orders %}
+            <div class="card border shadow-none" id="item_item">
+                <div class="card-body">
+                    <div class="d-flex align-items-start pb-3">
+                        <div class="flex-grow-1 align-self-center overflow-hidden">
+                            <div>
+                                <h5 class="text-truncate font-size-18">
+                                    <a href="#" class="text-dark">Заказ № {{ order.id }}</a>
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 ms-2">
+                          <a href="" class="btn btn-sm btn-danger">Подробнее</a>
+                        </div>
+                    </div>
+                  <div>Статус: {{ order.status }} </div>
+
+                </div>
+            </div>
+          {% endfor %}
+
+        </div>
+    </div>
+
+</div>
+
+
+<script src="{{ url_for('static', filename='js/jQuery.js') }}"></script>
+<script src="{{ url_for('static', filename='js/delete_item_from_cart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/manage_cart.js') }}"></script>
 {% endblock %}
