@@ -27,16 +27,41 @@ def profile():
     return render_template('profile.html', total_price=total_price, orders=orders)
 
 
+@main.route('/order_info', methods=['POST'])
+@login_required
+def order_info():
+    if request.method == "POST":
+        order_id = request.form.get('order_id')
+        order = Order.query.get(order_id)
+        if not order:
+            return 404
+
+        order_items = OrderItem.query.filter_by(order_id=order_id).all()
+
+        # Создаем список с подробной информацией о каждом товаре
+        items_info = []
+        for item in order_items:
+            product = Product.query.get(item.product_id)
+            item_info = {
+                'product_name': product.name,
+                'product_image_url': product.image_url,
+                'quantity': item.quantity,
+                'price': product.price,
+                'product_total_price': round(item.quantity * product.price, 2)
+            }
+            items_info.append(item_info)
+
+        return render_template('order_info.html', items=items_info, order=order)
+
+
 @main.route('/products')
 def products():
     category_id = request.args.get('category_id')
     products_in_category = db.session.query(Product).join(Category).filter(Category.id == category_id).all()
     try:
-        total_price = get_cart_total_price()
         cart = Cart.query.filter_by(user_id=current_user.id).all()
         cart_ids = [item.product_id for item in cart]
-        return render_template('products.html', products=products_in_category, category_id=category_id,
-                               total_price=total_price, cart=cart, cart_ids=cart_ids)
+        return render_template('products.html', products=products_in_category, category_id=category_id, cart=cart, cart_ids=cart_ids)
     except:
         return render_template('products.html', products=products_in_category, category_id=category_id)
 
@@ -48,13 +73,12 @@ def get_product():
         return redirect(url_for('main.index'))
     product = Product.query.get(product_id)
     try:
-        total_price = get_cart_total_price()
         cart = Cart.query.filter_by(user_id=current_user.id).all()
         cart_ids = [item.product_id for item in cart]
         return render_template('product.html', product=product,
-                               total_price=total_price, cart=cart, cart_ids=cart_ids)
+                                cart=cart, cart_ids=cart_ids)
     except:
-        return render_template('product.html', total_price=total_price, product=product)
+        return render_template('product.html', product=product)
 
 
 @main.route('/cart')
@@ -111,21 +135,31 @@ def create_order():
 
     total_price = get_cart_total_price()
 
-    # 1. Создаем запись в таблице Order
-    order = Order(user_id=user_id, order_date=datetime.utcnow(),
+    order = Order(user_id=user_id, order_date=datetime.now(),
                   total_price=total_price, status="Заказ создан")
     db.session.add(order)
-    db.session.flush()  # Чтобы получить id созданного заказа
+    db.session.flush()
 
-    # 2. Заносим товары в таблицу OrderItem
     for item in cart_items:
         order_item = OrderItem(order_id=order.id, user_id=user_id,
-                              product_id=item.product_id, quantity=item.quantity)
+                               product_id=item.product_id, quantity=item.quantity)
         db.session.add(order_item)
 
     Cart.query.filter_by(user_id=user_id).delete()
 
     db.session.commit()
+
+    return redirect(url_for('main.profile'))
+
+
+@main.route('/cancel_order', methods=['POST'])
+@login_required
+def cancel_order():
+    if request.method == "POST":
+        order_id = request.form.get('order_id')
+        order = Order.query.get_or_404(order_id)
+        order.status = "Заказ отменён"
+        db.session.commit()
 
     return redirect(url_for('main.profile'))
 
@@ -197,3 +231,9 @@ def _delete_item_from_cart():
     total_price = get_cart_total_price()
 
     return str(total_price)
+
+
+# app name
+@main.errorhandler(404)
+def not_found(e):
+    return render_template("404.html")

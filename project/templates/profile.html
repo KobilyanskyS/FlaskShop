@@ -57,14 +57,14 @@
 
 <div class="container mt-2">
 
-  <h3 class="title">
-  Мои заказы
-</h3>
+    <h3 class="title">
+        Мои заказы
+    </h3>
 
     <div class="row">
         <div class="col-xl-6">
 
-          {% for order in orders %}
+            {% for order in orders %}
             <div class="card border shadow-none" id="item_item">
                 <div class="card-body">
                     <div class="d-flex align-items-start pb-3">
@@ -76,14 +76,17 @@
                             </div>
                         </div>
                         <div class="flex-shrink-0 ms-2">
-                          <a href="" class="btn btn-sm btn-danger">Подробнее</a>
+                            <form method="POST" action="{{ url_for('main.order_info') }}" enctype="multipart/form-data">
+                                <input type="hidden" value="{{ order.id }}" name="order_id">
+                                <button type="submit" class="btn btn-sm btn-danger">Подробнее</button>
+                            </form>
                         </div>
                     </div>
-                  <div>Статус: {{ order.status }} </div>
-
+                    <div>Статус: {{ order.status }}</div>
+                    <p>{{ order.order_date.strftime('%d.%m.%Y  %H:%M') }}</p>
                 </div>
             </div>
-          {% endfor %}
+            {% endfor %}
 
         </div>
     </div>
