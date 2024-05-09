@@ -27,7 +27,7 @@ def login_post():
 
     login_user(user, remember=remember)
     # login code goes here
-    return redirect(url_for('main.profile'))
+    return redirect(url_for('main.index'))
 
 @auth.route('/signup')
 def signup():

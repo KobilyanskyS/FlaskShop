@@ -31,10 +31,12 @@ def profile():
 @login_required
 def order_info():
     if request.method == "POST":
+        user_id = current_user.id
         order_id = request.form.get('order_id')
-        order = Order.query.get(order_id)
+
+        order = Order.query.filter_by(id=order_id, user_id=user_id).first()
         if not order:
-            return 404
+            return render_template('404.html'), 404
 
         order_items = OrderItem.query.filter_by(order_id=order_id).all()
 
@@ -58,6 +60,8 @@ def order_info():
 def products():
     category_id = request.args.get('category_id')
     products_in_category = db.session.query(Product).join(Category).filter(Category.id == category_id).all()
+    if not products_in_category:
+        return render_template('404.html'), 404
     try:
         cart = Cart.query.filter_by(user_id=current_user.id).all()
         cart_ids = [item.product_id for item in cart]
@@ -231,9 +235,3 @@ def _delete_item_from_cart():
     total_price = get_cart_total_price()
 
     return str(total_price)
-
-
-# app name
-@main.errorhandler(404)
-def not_found(e):
-    return render_template("404.html")

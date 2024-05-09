@@ -1,0 +1,55 @@
+{% extends "admin/base_admin.html" %}
+
+{% block content %}
+
+<div class="container">
+    <h2 class="mb-3">Заказы</h2>
+    {{ pagination.links }}
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">№</th>
+            <th scope="col">Клиент</th>
+            <th scope="col">Дата заказа</th>
+            <th scope="col">Стоимость</th>
+            <th scope="col">Статус</th>
+            <th scope="col">Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td> {{ order.user_name }}</td>
+            <td>{{ order.order_date.strftime('%d.%m.%Y  %H:%M') }}</td>
+            <td>{{ order.total_price }}</td>
+            <td  id="status_{{ order.id }}">
+               {% if order.status == "Заказ создан" %}
+                <span class="text-success fw-bold">{{ order.status }} </span>
+                {% elif order.status == "Заказ отменён" %}
+                <span class="text-secondary">{{ order.status }} </span>
+                {% elif order.status == "Заказ готов" %}
+                <span class="text-warning fw-bold">{{ order.status }} </span>
+                {% elif order.status == "Заказ выдан" %}
+                <span class="fw-bold">{{ order.status }} </span>
+                {% endif %}
+            </td>
+            <td id="actions_{{ order.id }}">
+                 {% if order.status == "Заказ создан" %}
+                <button data-order-id="{{ order.id }}" type="button" class="btn btn-warning" onclick="isReady(this)">Заказ готов</button>
+                {% elif order.status == "Заказ готов" %}
+                <button data-order-id="{{ order.id }}"  type="button" class="btn btn-danger" onclick="isIssued(this)">Выдать заказ</button>
+                {% endif %}
+                <a href="{{ url_for('admin.show_order_details', order_id=order.id) }}" class="btn btn-info">Подробнее</a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="{{ url_for('static', filename='js/jQuery.js') }}"></script>
+<script src="{{ url_for('static', filename='js/isReady.js') }}"></script>
+<script src="{{ url_for('static', filename='js/isIssued.js') }}"></script>
+
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends "admin/base_admin.html" %}
+
+{% block content %}
+
+<style type="text/css">
+    .card {
+        box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
+    }
+    .card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0 solid rgba(0,0,0,.125);
+        border-radius: 1rem;
+    }
+    .card-footer{
+        background-color: white;
+    }
+    .text-reset {
+        --bs-text-opacity: 1;
+        color: inherit!important;
+    }
+    a {
+        color: #5465ff;
+        text-decoration: none;
+    }
+</style>
+<div class="container-fluid mt-4">
+    <div class="container">
+
+        <div class="">
+            <h2>Информация о заказе {{ order.id }} </h2>
+            <h3 id="status_{{ order.id }}">
+                {% if order.status == "Заказ создан" %}
+                <span class="text-success fw-bold">{{ order.status }} </span>
+                {% elif order.status == "Заказ отменён" %}
+                <span class="text-secondary">{{ order.status }} </span>
+                {% elif order.status == "Заказ готов" %}
+                <span class="text-warning fw-bold">{{ order.status }} </span>
+                {% elif order.status == "Заказ выдан" %}
+                <span class="fw-bold">{{ order.status }} </span>
+                {% endif %}
+            </h3>
+            <h5>Клиент: {{ order.user_name }}</h5>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <table class="table table-borderless">
+                            <thead>
+                            <td>Наименование товара</td>
+                            <td>Количество товара</td>
+                            <td>Цена товара</td>
+                            </thead>
+                            <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex mb-2">
+                                        <div class="flex-shrink-0">
+                                            <!-- ФОТКА -->
+                                            <img src="{{ item.product_image_url }}" alt
+                                                 width="35" class="img-fluid">
+                                        </div>
+                                        <div class="flex-lg-grow-1 ms-3">
+                                            <h6 class="small mb-0">{{ item.product_name }}</h6>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ item.quantity }}</td>
+                                <td class="text-end">{{ item.product_total_price }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                            <tfoot>
+                            <tr class="fw-bold">
+                                <td colspan="2">ИТОГ</td>
+                                <td class="text-end">{{ order.total_price }}</td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <h3 class="h6">Действия над заказом</h3>
+                                <div id="actions_{{ order.id }}">
+                                    {% if order.status == "Заказ создан" %}
+                                    <button data-order-id="{{ order.id }}" type="button" class="btn btn-warning"
+                                            onclick="isReady(this)">Заказ готов
+                                    </button>
+                                    {% elif order.status == "Заказ готов" %}
+                                    <button data-order-id="{{ order.id }}" type="button" class="btn btn-danger"
+                                            onclick="isIssued(this)">Выдать заказ
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="{{ url_for('static', filename='js/jQuery.js') }}"></script>
+<script src="{{ url_for('static', filename='js/isReady.js') }}"></script>
+<script src="{{ url_for('static', filename='js/isIssued.js') }}"></script>
+
+{% endblock %}

@@ -12,7 +12,6 @@ cli = FlaskGroup(app)
 @cli.command("create_admin")
 @click.argument("email")
 def create_admin(email):
-    """Creates an admin user."""
     password = getpass.getpass("Enter password: ")
     confirm_password = getpass.getpass("Enter password again: ")
     if password != confirm_password:

@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
@@ -14,6 +14,14 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 
     migrate = Migrate(app, db)
+
+    @app.errorhandler(404)
+    def not_found(e):
+        return render_template("404.html")
+
+    @app.errorhandler(403)
+    def forbidden(e):
+        return render_template("404.html")
 
     db.init_app(app)
 

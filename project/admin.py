@@ -3,8 +3,9 @@ import json
 import random
 from flask import Blueprint, render_template, request, redirect, url_for, abort
 from flask_login import login_required, current_user
+from flask_paginate import Pagination, get_page_args
 from . import db
-from .models import Product, Category
+from .models import Product, Category, Order, OrderItem, User
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -36,13 +37,12 @@ def generate_random_name():
         random_name += random.choice(characters)
     return random_name
 
-
 @admin.route('/shop_admin')
 @login_required
 def shop_admin():
     if not current_user.is_admin:
         abort(403)  # Access denied
-    return render_template('admin.html', name=current_user.name)
+    return render_template('admin/admin.html', name=current_user.name)
 
 
 @admin.route('/shop_admin/categories/add', methods=['POST'])
@@ -147,7 +147,7 @@ def manage_products():
     ])
 
     return render_template(
-        'manage_products.html',
+        'admin/manage_products.html',
         products_json=products_json,
         categories_json=categories_json,
         name=current_user.name,
@@ -237,3 +237,93 @@ def add_product():
     db.session.add(new_product)
     db.session.commit()
     return redirect(url_for('admin.manage_products'))
+
+@admin.route('/shop_admin/orders')
+@login_required
+def manage_orders():
+    if not current_user.is_admin:
+        abort(403)
+
+    page, per_page, offset = get_page_args(page_parameter='page',
+                                           per_page_parameter='per_page')
+    per_page = 20  # Explicitly set 20 items per page
+
+    offset = (page - 1) * per_page
+
+    orders_query = Order.query.order_by(Order.order_date.desc())
+    total = orders_query.count()
+
+    pagination = Pagination(page=page, per_page=per_page, total=total,
+                            css_framework='bootstrap5', format_total='',
+                            prev_label='<<', next_label='>>')
+
+    orders = orders_query.limit(per_page).offset(offset).all()
+
+    for order in orders:
+        user = User.query.get(order.user_id)
+        order.user_name = user.name
+
+    return render_template('admin/manage_orders.html', orders=orders,
+                           pagination=pagination, name=current_user.name)
+
+
+@admin.route('/_switch_order_status_to_ready', methods=['POST'])
+@login_required
+def order_ready():
+    if request.method == 'POST':
+        order_id = int(request.form['order_id'])
+        user_id = current_user.id
+
+        order = Order.query.filter_by(id=order_id).first()
+        if not order:
+            return render_template('404.html'), 404
+
+        order.status = "Заказ готов"
+        db.session.commit()
+
+        return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+
+@admin.route('/_switch_order_status_to_issued', methods=['POST'])
+@login_required
+def order_issued():
+    if request.method == 'POST':
+        order_id = int(request.form['order_id'])
+        user_id = current_user.id
+
+        order = Order.query.filter_by(id=order_id).first()
+        if not order:
+            return render_template('404.html'), 404
+
+        order.status = "Заказ выдан"
+        db.session.commit()
+
+        return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+
+@admin.route('/shop_admin/orders/order_details')
+@login_required
+def show_order_details():
+    order_id = request.args.get('order_id')
+
+    order = Order.query.filter_by(id=order_id).first()
+    if not order:
+        return render_template('404.html'), 404
+
+    user = User.query.get(order.user_id)
+    order.user_name = user.name
+
+    order_items = OrderItem.query.filter_by(order_id=order_id).all()
+
+    items_info = []
+    for item in order_items:
+        product = Product.query.get(item.product_id)
+
+        item_info = {
+            'product_name': product.name,
+            'product_image_url': product.image_url,
+            'quantity': item.quantity,
+            'price': product.price,
+            'product_total_price': round(item.quantity * product.price, 2)
+        }
+        items_info.append(item_info)
+
+    return render_template('admin/order_details.html', items=items_info, order=order)

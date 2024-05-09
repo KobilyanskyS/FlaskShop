@@ -22,6 +22,12 @@
                         <a href="{{ url_for('main.profile') }}" class="nav-link">Мои заказы</a>
                     </li>
                     {% endif %}
+                    {% if current_user.is_authenticated and current_user.is_admin %}
+                    <li class="nav-item">
+                        <a href="{{ url_for('admin.shop_admin') }}" class="nav-link">Админ-панель</a>
+                    </li>
+                    {% endif %}
+
                     {% if not current_user.is_authenticated %}
                     <li class="nav-item">
                         <a href="{{ url_for('auth.login') }}" class="nav-link">Войти</a>
