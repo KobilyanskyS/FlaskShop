@@ -76,7 +76,7 @@
                             </div>
                         </div>
                         <div class="flex-shrink-0 ms-2">
-                            <form method="POST" action="{{ url_for('main.order_info') }}" enctype="multipart/form-data">
+                            <form method="POST" action="{{ url_for('shop.order_info') }}" enctype="multipart/form-data">
                                 <input type="hidden" value="{{ order.id }}" name="order_id">
                                 <button type="submit" class="btn btn-sm btn-danger">Подробнее</button>
                             </form>

@@ -8,6 +8,9 @@ function delete_item_from_cart(e) {
                     $('#total_price').html(response)
                     $('#cart_total_price').html(response)
                     $(`#item_${product_id}`).remove()
+                    if (response == 0){
+                        $('#create_order').html('')
+                    }
                 }
         });
     }

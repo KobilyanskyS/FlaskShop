@@ -16,7 +16,7 @@
                             </div>
                         </div>
                         <div class="col-md-6 col-lg-6 col-xl-6">
-                            <h5><a href="{{ url_for('main.get_product', product_id=product.id) }}" class="text-danger">{{ product.name }}</a></h5>
+                            <h5><a href="{{ url_for('shop.get_product', product_id=product.id) }}" class="text-danger">{{ product.name }}</a></h5>
                             <p class="mb-4 mb-md-0">
                                 {{ product.description }}
                             </p>

@@ -9,7 +9,7 @@
         <thead>
         <tr>
             <th scope="col">№</th>
-            <th scope="col">Клиент</th>
+            <th scope="col">Покупатель</th>
             <th scope="col">Дата заказа</th>
             <th scope="col">Стоимость</th>
             <th scope="col">Статус</th>
@@ -34,13 +34,17 @@
                 <span class="fw-bold">{{ order.status }} </span>
                 {% endif %}
             </td>
-            <td id="actions_{{ order.id }}">
-                 {% if order.status == "Заказ создан" %}
-                <button data-order-id="{{ order.id }}" type="button" class="btn btn-warning" onclick="isReady(this)">Заказ готов</button>
-                {% elif order.status == "Заказ готов" %}
-                <button data-order-id="{{ order.id }}"  type="button" class="btn btn-danger" onclick="isIssued(this)">Выдать заказ</button>
-                {% endif %}
-                <a href="{{ url_for('admin.show_order_details', order_id=order.id) }}" class="btn btn-info">Подробнее</a>
+            <td>
+                <div  id="actions_{{ order.id }}">
+                    {% if order.status == "Заказ создан" %}
+                    <button data-order-id="{{ order.id }}" type="button" class="btn btn-warning" onclick="isReady(this)">Заказ готов</button>
+                    {% elif order.status == "Заказ готов" %}
+                    <button data-order-id="{{ order.id }}"  type="button" class="btn btn-danger" onclick="isIssued(this)">Выдать заказ</button>
+                    {% endif %}
+                </div>
+                <div class="mt-1">
+                    <a href="{{ url_for('admin.show_order_details', order_id=order.id) }}" class="btn btn-info text-light">Подробнее</a>
+                </div>
             </td>
         </tr>
         {% endfor %}
