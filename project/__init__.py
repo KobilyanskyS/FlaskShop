@@ -12,7 +12,7 @@ def create_app():
     app.config['SECRET_KEY'] = 'fdkjshfhjsdfdskfdsfdcbsjdkfdsdf'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 
-    migrate = Migrate(app, db)
+    migrate = Migrate(app, db, render_as_batch=False)
 
     @app.errorhandler(404)
     def not_found(e):

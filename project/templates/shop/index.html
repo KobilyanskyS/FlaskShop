@@ -2,9 +2,58 @@
 
 {% block content %}
 
+{% macro render_categories(categories, parent_category=None) %}
+{% for category in categories %}
+{% if category.main_category == parent_category %}
+<li class="m-10" style="list-style-type:none;">
+    {% if categories|selectattr("main_category", "==", category.id)|list %}
+    {{ category.name }}
+    <ul>
+        {{ render_categories(categories, category.id) }}
+    </ul>
+    {% else %}
+    <a href="{{ url_for('shop.products', category_id=category.id) }}">{{ category.name }}</a>
+    {% endif %}
+</li>
+{% endif %}
+{% endfor %}
+{% endmacro %}
+
+<style>
+    .carousel {
+        border-radius: 35px 35px 35px 35px;
+        overflow: hidden;
+    }
+
+</style>
+
+
 <button type="button" class="btn btn-outline-dark btn-lg mt-3" data-bs-toggle="modal"
         data-bs-target="#categoriesModalFullscreen">Категории
 </button>
+
+<div class="d-flex justify-content-center">
+    <div id="carouselExampleAutoplaying" class="carousel slide mt-2 col-xl-8 mx-auto" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        {% for i, banner in enumerate(banners) %}
+        <div class="carousel-item {% if i == 0 %}active{% endif %}">
+            <img src="{{ banner.image_url }}" class="d-block w-100" alt="{{ banner.name }}">
+        </div>
+        {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying"
+            data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Назад</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying"
+            data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Вперёд</span>
+    </button>
+</div>
+</div>
+
 
 <div class="modal fade" id="categoriesModalFullscreen" aria-labelledby="exampleModalFullscreenLabel">
     <div class="modal-dialog modal-fullscreen">
@@ -14,33 +63,10 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body d-flex flex-wrap align-items-start">
-
-                {% macro render_categories(categories, parent_category=None) %}
-                {% for category in categories %}
-                {% if category.main_category == parent_category %}
-                <li class="m-10" style="list-style-type:none;">
-                    {% if categories|selectattr("main_category", "==", category.id)|list %}
-                    {{ category.name }}
-                    <ul>
-                        {{ render_categories(categories, category.id) }}
-                    </ul>
-                    {% else %}
-                    <a href="{{ url_for('shop.products', category_id=category.id) }}">{{ category.name }}</a>
-                    {% endif %}
-                </li>
-                {% endif %}
-                {% endfor %}
-                {% endmacro %}
-
-
-
                 {{ render_categories(categories) }}
-
-
-
-                    </div>
-                </div>
             </div>
         </div>
+    </div>
+</div>
 
-        {% endblock %}
+{% endblock %}

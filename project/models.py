@@ -50,3 +50,9 @@ class OrderItem(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
     quantity = db.Column(db.Integer, CheckConstraint('quantity >= 0'))
+
+
+class Banners(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False, unique=True)
+    image_url = db.Column(db.String(255), nullable=False, unique=True)

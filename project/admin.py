@@ -5,7 +5,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, abort
 from flask_login import login_required, current_user
 from flask_paginate import Pagination, get_page_args
 from . import db
-from .models import Product, Category, Order, OrderItem, User
+from .models import Product, Category, Order, OrderItem, User, Banners
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -270,6 +270,8 @@ def manage_orders():
 @admin.route('/_switch_order_status_to_ready', methods=['POST'])
 @login_required
 def order_ready():
+    if not current_user.is_admin:
+        abort(403)
     if request.method == 'POST':
         order_id = int(request.form['order_id'])
         user_id = current_user.id
@@ -286,6 +288,8 @@ def order_ready():
 @admin.route('/_switch_order_status_to_issued', methods=['POST'])
 @login_required
 def order_issued():
+    if not current_user.is_admin:
+        abort(403)
     if request.method == 'POST':
         order_id = int(request.form['order_id'])
         user_id = current_user.id
@@ -302,6 +306,8 @@ def order_issued():
 @admin.route('/shop_admin/orders/order_details')
 @login_required
 def show_order_details():
+    if not current_user.is_admin:
+        abort(403)
     order_id = request.args.get('order_id')
 
     order = Order.query.filter_by(id=order_id).first()
@@ -327,3 +333,36 @@ def show_order_details():
         items_info.append(item_info)
 
     return render_template('admin/order_details.html', items=items_info, order=order)
+
+
+@admin.route('/shop_admin/manage_index')
+@login_required
+def manage_index():
+    if not current_user.is_admin:
+        abort(403)
+
+    banners = Banners.query.order_by(Banners.id.desc())
+
+    return render_template('admin/manage_index.html', banners=banners)
+
+
+@admin.route('/shop_admin/manage_index/_add_banner',  methods=['POST'])
+@login_required
+def add_banner():
+    if not current_user.is_admin:
+        abort(403)
+    if request.method == "POST":
+        name = request.form.get('name')
+        image_url = ''
+        if name is None:
+            redirect(url_for('admin.manage_index'))
+        if 'file' in request.files:
+            image_url = save_file(folder="./project/static/banners/", file=request.files['file'])
+        if image_url is None:
+            redirect(url_for('admin.manage_index'))
+
+        new_banner = Banners(name=name, image_url=image_url)
+
+        db.session.add(new_banner)
+        db.session.commit()
+        return redirect(url_for('admin.manage_index'))

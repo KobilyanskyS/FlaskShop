@@ -1,0 +1,36 @@
+{% extends "admin/base_admin.html" %}
+
+{% block content %}
+
+<div class="container col-6">
+    <h2>Баннеры</h2>
+
+    <form method="POST" action="{{ url_for('admin.add_banner') }}" enctype="multipart/form-data">
+        <div class="input-group">
+            <input type="file" placeholder="Загрузите изображение" name="file" class="form-control">
+            <input type="text" placeholder="Введите название" name="name" class="form-control">
+            <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal">
+                Добавить баннер
+            </button>
+        </div>
+    </form>
+    <table class="table" id="productsTable">
+        <thead>
+        <tr>
+            <th>Баннер</th>
+            <th>Название</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for banner in banners %}
+        <tr>
+            <td><img width="200px" src="{{banner.image_url}}" alt=""></td>
+            <td>{{banner.name}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}
