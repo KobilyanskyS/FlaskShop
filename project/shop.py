@@ -1,6 +1,7 @@
 from datetime import datetime
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
 from flask_login import login_required, current_user
+from flask_paginate import Pagination, get_page_args
 from sqlalchemy import or_
 from . import db
 from .models import Product, Category, Cart, Order, OrderItem
@@ -21,7 +22,10 @@ def my_orders():
 @shop.route('/search', methods=['POST'])
 def search_products():
     if request.method == "POST":
-        search_input = request.form.get('search_input')
+        search_input = request.form.get('search_input').upper()
+
+        if not search_input:
+            return render_template('404.html'), 404
 
         results = Product.query.filter(or_(
             Product.name.ilike(f"%{search_input}%"),
@@ -62,15 +66,29 @@ def order_info():
 def products():
     category_id = request.args.get('category_id')
     products_in_category = db.session.query(Product).join(Category).filter(Category.id == category_id).all()
+
+    total = len(products_in_category)
+
+    page, per_page, offset = get_page_args(page_parameter='page', per_page_parameter='per_page')
+    per_page = 20
+    offset = (page - 1) * per_page
+    pagination = Pagination(page=page, per_page=per_page, total=total,
+                            css_framework='bootstrap5', format_total='',
+                            prev_label='<<', next_label='>>')
+
+    products_in_category = db.session.query(Product).join(Category).filter(Category.id == category_id).limit(
+        per_page).offset(offset).all()
+
     if not products_in_category:
         return render_template('404.html'), 404
     try:
         cart = Cart.query.filter_by(user_id=current_user.id).all()
         cart_ids = [item.product_id for item in cart]
-        return render_template('shop/products.html', products=products_in_category, category_id=category_id, cart=cart, cart_ids=cart_ids)
+        return render_template('shop/products.html', products=products_in_category, category_id=category_id, cart=cart,
+                               cart_ids=cart_ids, pagination=pagination)
     except:
-        return render_template('shop/products.html', products=products_in_category, category_id=category_id)
-
+        return render_template('shop/products.html', products=products_in_category, category_id=category_id,
+                               pagination=pagination)
 
 @shop.route('/product')
 def get_product():
@@ -121,8 +139,8 @@ def order():
     total_price = get_cart_total_price()
 
     for item in cart_items:
-        product = Product.query.get(item.product_id)  # Получаем данные о товаре
-        item_total_price = product.price * item.quantity  # Рассчитываем стоимость товара с учетом количества
+        product = Product.query.get(item.product_id)
+        item_total_price = product.price * item.quantity
 
         order_data.append({
             'product_name': product.name,

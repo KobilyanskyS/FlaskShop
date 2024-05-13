@@ -5,7 +5,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, abort
 from flask_login import login_required, current_user
 from flask_paginate import Pagination, get_page_args
 from . import db
-from .models import Product, Category, Order, OrderItem, User, Banners
+from .models import Product, Category, Order, OrderItem, User, Banners, IndexCategory
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -41,7 +41,7 @@ def generate_random_name():
 @login_required
 def shop_admin():
     if not current_user.is_admin:
-        abort(403)  # Access denied
+        abort(403)
     return render_template('admin/admin.html', name=current_user.name)
 
 
@@ -52,17 +52,11 @@ def add_category():
         abort(403)
     name = request.form.get('name')
     main_category = request.form.get('main_category')
-    image_url = ''
-
-    if 'file' in request.files:
-        image_url = save_file(folder="./project/static/categories/", file=request.files['file'])
-    if image_url is None:
-        image_url = '/static/categories/default_category.png'
 
     if main_category == "":
         main_category = None
 
-    new_category = Category(main_category=main_category, name=name, image_url=image_url)
+    new_category = Category(main_category=main_category, name=name)
     db.session.add(new_category)
     db.session.commit()
     return redirect(url_for('admin.manage_products'))
@@ -79,11 +73,6 @@ def edit_category():
 
     name = request.form.get('update_category_name')
     main_category = request.form.get('update_category_main_category')
-
-    if 'file' in request.files:
-        new_image_url = save_file(folder="./project/static/categories/", file=request.files['file'])
-        if new_image_url:
-            category.image_url = new_image_url
 
     if main_category != '':
         category.main_category = main_category
@@ -102,11 +91,6 @@ def delete_category():
     category_id = request.form.get('category_id')
     category = Category.query.get_or_404(category_id)
 
-    f = category.image_url
-
-    if f != '/static/categories/default_category.png':
-        os.remove('./project'+f)
-
     db.session.delete(category)
     db.session.commit()
 
@@ -122,7 +106,6 @@ def manage_products():
         .join(Category, Product.category_id == Category.id) \
         .all()
 
-    # Преобразуем данные в JSON
     products_json = json.dumps([
         {
             "id": product.id,
@@ -140,9 +123,8 @@ def manage_products():
         {
             "id": category.id,
             "name": category.name,
-            "level": category.level,
+            "level": category.level * "-",
             "main_category": category.main_category,
-            "image_url": category.image_url
         } for category in categories
     ])
 
@@ -246,7 +228,7 @@ def manage_orders():
 
     page, per_page, offset = get_page_args(page_parameter='page',
                                            per_page_parameter='per_page')
-    per_page = 20  # Explicitly set 20 items per page
+    per_page = 20
 
     offset = (page - 1) * per_page
 
@@ -340,11 +322,18 @@ def show_order_details():
 def manage_index():
     if not current_user.is_admin:
         abort(403)
-
     banners = Banners.query.order_by(Banners.id.desc())
+    categories = get_categories_hierarchically()
+    index_category = IndexCategory.query.get(1)
+    if index_category is not None:
+        category_id = index_category.category_id
+        cur_category = Category.query.get(category_id).name
+        for banner in banners:
+            category_name = Category.query.get(banner.category_id)
+            banner.category_name = category_name.name
+        return render_template('admin/manage_index.html', cur_category=cur_category, banners=banners, categories=categories, name=current_user.name)
 
-    return render_template('admin/manage_index.html', banners=banners)
-
+    return render_template('admin/manage_index.html', cur_category='', banners=banners, categories=categories, name=current_user.name)
 
 @admin.route('/shop_admin/manage_index/_add_banner',  methods=['POST'])
 @login_required
@@ -353,16 +342,60 @@ def add_banner():
         abort(403)
     if request.method == "POST":
         name = request.form.get('name')
+        category_id = request.form.get('category_id')
         image_url = ''
-        if name is None:
+        is_active = True
+        if name or category_id is None:
             redirect(url_for('admin.manage_index'))
         if 'file' in request.files:
             image_url = save_file(folder="./project/static/banners/", file=request.files['file'])
         if image_url is None:
             redirect(url_for('admin.manage_index'))
 
-        new_banner = Banners(name=name, image_url=image_url)
+        new_banner = Banners(name=name, image_url=image_url, category_id=category_id, is_active=is_active)
 
         db.session.add(new_banner)
         db.session.commit()
         return redirect(url_for('admin.manage_index'))
+
+
+@admin.route('/shop_admin/manage_index/_switch_banner_activity', methods=['POST'])
+@login_required
+def switch_banner_activity():
+    if not current_user.is_admin:
+        abort(403)
+    if request.method == 'POST':
+        is_active = request.form['is_active'].lower() == 'true'
+
+        banner_id = int(request.form['banner_id'])
+        banner = Banners.query.get_or_404(banner_id)
+        banner.is_active = not is_active
+        db.session.commit()
+        print(banner.is_active)
+        item_info = {
+            'is_active': banner.is_active
+            }
+        return item_info
+
+
+
+
+@admin.route('/shop_admin/manage_index/_choose_category', methods=['POST'])
+@login_required
+def index_category():
+    try:
+        category_id = request.form.get('category_id')
+    except:
+        return render_template('404.html'), 404
+    if not current_user.is_admin:
+        abort(403)
+    if request.method == "POST":
+        index_category = IndexCategory.query.get(1)
+        if index_category:
+            index_category.category_id = category_id
+        else:
+            index_category = IndexCategory(id=1, category_id=category_id)
+            db.session.add(index_category)
+        db.session.commit()
+    cur_category = Category.query.get(category_id)
+    return cur_category.name

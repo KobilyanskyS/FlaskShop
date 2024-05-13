@@ -58,8 +58,7 @@ function renderCategoriesTable(categories) {
   const tbody = document.querySelector('#categoriesTable tbody');
   tbody.innerHTML = categories.map(category => `
     <tr>
-      <td><img width="40px" src="${category.image_url}" alt=""></td>
-      <td>${category.name}</td>
+      <td>${category.level} ${category.name}</td>
       <td>
         <a class="btn btn-sm btn-success"
             data-bs-toggle="modal"

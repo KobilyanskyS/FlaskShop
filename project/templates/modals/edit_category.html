@@ -9,11 +9,6 @@
             <form method="POST" action="{{ url_for('admin.edit_category') }}" enctype="multipart/form-data">
                 <input type="hidden" name="update_category_id" id="update_category_id">
                 <div class="modal-body">
-                    <div class="form-group" style="width: 300px;">
-                        <img id="update_category_image" src="" alt="" width="40px">
-                        <label for="category_file" class="form-label">Изображение категории</label>
-                        <input type="file" name="file" class="form-control">
-                    </div>
                     <div class="form-group">
                         <label for="category_name">Название категории:</label>
                         <input type="text" name="update_category_name" id="update_category_name" class="form-control">

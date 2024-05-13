@@ -25,6 +25,15 @@
         overflow: hidden;
     }
 
+    .pagination .page-link {
+      color: red;
+    }
+
+    .pagination .page-item.active .page-link {
+      background-color: red;
+      border-color: red;
+      color: white;
+    }
 </style>
 
 
@@ -37,7 +46,9 @@
     <div class="carousel-inner">
         {% for i, banner in enumerate(banners) %}
         <div class="carousel-item {% if i == 0 %}active{% endif %}">
-            <img src="{{ banner.image_url }}" class="d-block w-100" alt="{{ banner.name }}">
+            <a href="{{ url_for('shop.products', category_id=banner.category_id) }}">
+                <img src="{{ banner.image_url }}" class="d-block w-100" alt="{{ banner.name }}">
+            </a>
         </div>
         {% endfor %}
     </div>
@@ -55,6 +66,96 @@
 </div>
 
 
+<div>
+    <h3 class="mt-2 mb-2">{{ cur_category.name }}</h3>
+
+        {% for product in products %}
+    <div class="row justify-content-center mb-3">
+        <div class="col-md-12 col-xl-12">
+            <div class="card shadow-0 border rounded-3">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12 col-lg-3 col-xl-3 mb-4 mb-lg-0">
+                            <div class="bg-image hover-zoom ripple rounded ripple-surface">
+                                <img src="{{ product.image_url }}"
+                                     class="w-100"/>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-6 col-xl-6">
+                            <h5><a href="{{ url_for('shop.get_product', product_id=product.id) }}" class="text-danger">{{ product.name }}</a></h5>
+                            <p class="mb-4 mb-md-0">
+                                {{ product.description }}
+                            </p>
+                        </div>
+                        <div class="col-md-6 col-lg-3 col-xl-3 border-sm-start-none border-start">
+                            <div class="d-flex flex-row align-items-center mb-1">
+                                <h4 class="mb-1 me-1">{{ product.price }} р.</h4>
+                            </div>
+                            <div class="d-flex flex-column mt-4 product_btns" id="product_btns_{{ product.id }}">
+                                {% if current_user.is_authenticated %}
+                                {% if product.id in cart_ids %}
+                                <div class="btn-group" role="group" aria-label="Basic outlined example">
+                                    <button type="button" class="btn btn-outline-danger add_to_cart"
+                                            data-product-id="{{ product.id }}"
+                                            data-btn-type="counter"
+                                            data-btn-val="-1"
+                                            onclick="add_to_cart(this)">-
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger counter"
+                                            id="product_{{ product.id }}">
+                                        {% for items in cart %}
+                                        {% if items.product_id == product.id %}
+                                        {{ items.quantity }}
+                                        {% endif %}
+                                        {% endfor %}
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger add_to_cart"
+                                            data-product-id="{{ product.id }}"
+                                            data-btn-type="counter"
+                                            data-btn-val="1"
+                                            onclick="add_to_cart(this)">+
+                                    </button>
+                                </div>
+                                {% else %}
+                                <button data-mdb-button-init data-mdb-ripple-init
+                                        class="btn btn-outline-danger btn-sm mt-2 add_to_cart" type="button"
+                                        data-product-id="{{ product.id }}"
+                                        data-btn-type="default"
+                                        data-btn-val="1"
+                                        onclick="add_to_cart(this)">Добавить в корзину
+                                </button>
+                                {% endif %}
+                                {% else %}
+                                <div><a href="{{ url_for('auth.login') }}">Войдите</a> или <a href="{{ url_for('auth.signup') }}">Зарегистрируйтесь</a></div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <style>
+        .pagination .page-link {
+      color: red;
+    }
+
+    .pagination .page-item.active .page-link {
+      background-color: red;
+      border-color: red;
+      color: white;
+    }
+</style>
+    <div class="d-flex justify-content-center">
+        {{ pagination.links }}
+    </div>
+
+
+</div>
+
+
 <div class="modal fade" id="categoriesModalFullscreen" aria-labelledby="exampleModalFullscreenLabel">
     <div class="modal-dialog modal-fullscreen">
         <div class="modal-content">
@@ -69,4 +170,6 @@
     </div>
 </div>
 
+<script src="{{ url_for('static', filename='js/jQuery.js') }}"></script>
+<script src="{{ url_for('static', filename='js/add_to_cart.js') }}"></script>
 {% endblock %}

@@ -4,7 +4,7 @@ from . import db
 
 
 class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
+    id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
     name = db.Column(db.String(1000))
@@ -25,8 +25,7 @@ class Product(db.Model):
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     main_category = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
-    name = db.Column(db.String(255), nullable=False, unique=True)
-    image_url = db.Column(db.String(255))
+    name = db.Column(db.String(255), nullable=False)
 
 
 class Cart(db.Model):
@@ -54,5 +53,12 @@ class OrderItem(db.Model):
 
 class Banners(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False, unique=True)
+    name = db.Column(db.String(255), nullable=False)
     image_url = db.Column(db.String(255), nullable=False, unique=True)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
+    is_active = db.Column(db.Boolean, nullable=False)
+
+
+class IndexCategory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
