@@ -129,9 +129,9 @@
         <div class="col mb-3">
             <h5>Информация</h5>
             <ul class="nav flex-column">
-                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">О магазине</a></li>
-                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Контакты</a></li>
-                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Политика конфиденциальности</a></li>
+                <li class="nav-item mb-2"><a href="{{ url_for('shop.about') }}" class="nav-link p-0 text-body-secondary">О магазине</a></li>
+                <li class="nav-item mb-2"><a href="{{ url_for('shop.contacts') }}" class="nav-link p-0 text-body-secondary">Контакты</a></li>
+                <li class="nav-item mb-2"><a href="{{ url_for('shop.privacy_policy') }}" class="nav-link p-0 text-body-secondary">Политика конфиденциальности</a></li>
             </ul>
         </div>
     </footer>

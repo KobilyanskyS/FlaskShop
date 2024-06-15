@@ -13,7 +13,8 @@
 
         </select>
     </div>
-    <table class="table" id="productsTable">
+    <div class="overflow-auto mt-2" style="height: 600px;">
+        <table class="table" id="productsTable">
         <thead>
         <tr>
             <th>Фото</th>
@@ -28,7 +29,7 @@
 
         </tbody>
     </table>
-
+    </div>
 </div>
 <div class="container">
     <h2>Категории</h2>
@@ -38,7 +39,8 @@
     </button>
     <input type="text" id="categorySearch" placeholder="Поиск категорий..." class="form-control">
     </div>
-    <table class="table" id="categoriesTable">
+    <div class="overflow-auto mt-2" style="height: 600px;">
+        <table class="table" id="categoriesTable">
         <thead>
         <tr>
             <th>Название</th>
@@ -49,6 +51,7 @@
 
         </tbody>
     </table>
+    </div>
 </div>
 
 {%  include "modals/add_product.html" %}

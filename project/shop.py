@@ -10,6 +10,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 shop = Blueprint('shop', __name__)
 
+
 @shop.route('/my_orders')
 @login_required
 def my_orders():
@@ -18,6 +19,7 @@ def my_orders():
         .order_by(Order.order_date.desc()) \
         .all()
     return render_template('shop/my_orders.html', total_price=total_price, orders=orders)
+
 
 @shop.route('/search', methods=['POST'])
 def search_products():
@@ -33,6 +35,7 @@ def search_products():
         )).all()
 
         return render_template('shop/search.html', products=results)
+
 
 @shop.route('/order_info', methods=['POST'])
 @login_required
@@ -89,6 +92,7 @@ def products():
     except:
         return render_template('shop/products.html', products=products_in_category, category_id=category_id,
                                pagination=pagination)
+
 
 @shop.route('/product')
 def get_product():
@@ -257,3 +261,16 @@ def _delete_item_from_cart():
     total_price = get_cart_total_price()
 
     return str(total_price)
+
+
+@shop.route('/about')
+def about():
+    return render_template('shop/about.html')
+
+@shop.route('/contacts')
+def contacts():
+    return render_template('shop/contacts.html')
+
+@shop.route('/privacy_policy')
+def privacy_policy():
+    return render_template('shop/privacy_policy.html')
