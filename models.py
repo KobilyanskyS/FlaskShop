@@ -1,7 +1,6 @@
 from flask_login import UserMixin
 from sqlalchemy import CheckConstraint
-from . import db
-
+from extensions import db
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -10,7 +9,6 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(1000))
     created_on = db.Column(db.DateTime, nullable=False)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
-
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -21,19 +19,16 @@ class Product(db.Model):
     image_url = db.Column(db.String(255))
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
 
-
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     main_category = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
     name = db.Column(db.String(255), nullable=False)
-
 
 class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
     quantity = db.Column(db.Integer, CheckConstraint('quantity >= 0'))
-
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -42,7 +37,6 @@ class Order(db.Model):
     total_price = db.Column(db.Float)
     status = db.Column(db.String(255), nullable=False)
 
-
 class OrderItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
@@ -50,14 +44,12 @@ class OrderItem(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
     quantity = db.Column(db.Integer, CheckConstraint('quantity >= 0'))
 
-
 class Banners(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     image_url = db.Column(db.String(255), nullable=False, unique=True)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
     is_active = db.Column(db.Boolean, nullable=False)
-
 
 class IndexCategory(db.Model):
     id = db.Column(db.Integer, primary_key=True)

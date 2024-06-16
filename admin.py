@@ -4,8 +4,8 @@ import random
 from flask import Blueprint, render_template, request, redirect, url_for, abort
 from flask_login import login_required, current_user
 from flask_paginate import Pagination, get_page_args
-from . import db
-from .models import Product, Category, Order, OrderItem, User, Banners, IndexCategory
+from extensions import db
+from models import Product, Category, Order, OrderItem, User, Banners, IndexCategory
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 

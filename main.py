@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template
-from .admin import get_categories_hierarchically
-from .models import Banners, IndexCategory, Product, Category, Cart
+from admin import get_categories_hierarchically
+from models import Banners, IndexCategory, Product, Category, Cart
 from flask_login import current_user
 from flask_paginate import Pagination, get_page_args
-from . import db
+from extensions import db
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 

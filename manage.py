@@ -1,12 +1,12 @@
 from flask.cli import FlaskGroup
-from project import create_app, db
-from werkzeug.security import generate_password_hash # Import your create_app function and db instance
-from project.models import User
+from app import app
+from extensions import db
+from werkzeug.security import generate_password_hash
+from models import User
 import click
 import getpass
 import datetime
 
-app = create_app()
 cli = FlaskGroup(app)
 
 @cli.command("create_admin")
@@ -19,7 +19,13 @@ def create_admin(email):
         return
     try:
         created_on = datetime.datetime.now()
-        user = User(email=email, name="Администратор", password=generate_password_hash(password, method='sha256'), created_on=created_on, is_admin=True)
+        user = User(
+            email=email, 
+            name="Администратор", 
+            password=generate_password_hash(password, method='sha256'), 
+            created_on=created_on, 
+            is_admin=True
+        )
         db.session.add(user)
         db.session.commit()
         print(f"Admin user with email '{email}' created successfully!")

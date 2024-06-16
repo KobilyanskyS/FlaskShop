@@ -3,8 +3,8 @@ from flask import Blueprint, render_template, request, jsonify, redirect, url_fo
 from flask_login import login_required, current_user
 from flask_paginate import Pagination, get_page_args
 from sqlalchemy import or_
-from . import db
-from .models import Product, Category, Cart, Order, OrderItem
+from extensions import db
+from models import Product, Category, Cart, Order, OrderItem
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
