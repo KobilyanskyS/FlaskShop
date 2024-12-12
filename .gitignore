@@ -8,9 +8,6 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-categories/
-products/
-banners/
 build/
 develop-eggs/
 dist/
