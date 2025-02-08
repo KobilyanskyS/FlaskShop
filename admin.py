@@ -23,11 +23,19 @@ def save_file(folder, file):
         _, ext = os.path.splitext(file.filename)
         filename = f"{random_name}{ext}"
         file_path = os.path.join(folder, filename)
+
+        os.makedirs(folder, exist_ok=True)
+
         file.save(file_path)
-        relative_path = os.path.relpath(file_path, start=os.path.join(os.getcwd(), 'project'))
-        return f"/{relative_path.replace(os.sep, '/')}"
+
+        project_root = os.getcwd()
+        static_root = os.path.join(project_root, "static")
+        relative_path = os.path.relpath(file_path, start=static_root)
+
+        return f"/static/{relative_path.replace(os.sep, '/')}"
     else:
         return None
+
 
 
 def generate_random_name():
@@ -163,7 +171,7 @@ def edit_product():
     category_id = request.form.get('update_product_category_name')
 
     if 'file' in request.files:
-        new_image_url = save_file(folder="./project/static/products/", file=request.files['file'])
+        new_image_url = save_file(folder="./static/products/", file=request.files['file'])
         if new_image_url:
             product.image_url = new_image_url
 
@@ -182,13 +190,18 @@ def edit_product():
 def delete_product():
     if not current_user.is_admin:
         abort(403)
+        
     product_id = request.form.get('product_id')
     product = Product.query.get_or_404(product_id)
 
     f = product.image_url
 
     if f != '/static/products/default_product.png':
-        os.remove('./project'+f)
+        
+        file_path = os.path.join(os.getcwd(), f.lstrip('/'))  
+        
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
     db.session.delete(product)
     db.session.commit()
@@ -208,7 +221,7 @@ def add_product():
     image_url = ''
 
     if 'file' in request.files:
-        image_url = save_file(folder="./project/static/products/", file=request.files['file'])
+        image_url = save_file(folder="./static/products/", file=request.files['file'])
     if image_url is None:
         image_url = '/static/products/default_product.png'
 
@@ -348,7 +361,7 @@ def add_banner():
         if name or category_id is None:
             redirect(url_for('admin.manage_index'))
         if 'file' in request.files:
-            image_url = save_file(folder="./project/static/banners/", file=request.files['file'])
+            image_url = save_file(folder="./static/banners/", file=request.files['file'])
         if image_url is None:
             redirect(url_for('admin.manage_index'))
 
@@ -371,7 +384,6 @@ def switch_banner_activity():
         banner = Banners.query.get_or_404(banner_id)
         banner.is_active = not is_active
         db.session.commit()
-        print(banner.is_active)
         item_info = {
             'is_active': banner.is_active
             }

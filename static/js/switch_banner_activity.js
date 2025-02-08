@@ -8,8 +8,6 @@ function switchBannerActivity(e) {
     else
         is_active = true
 
-    console.log(banner_id)
-    console.log(is_active)
     $.ajax({
         type: "POST",
         url: "/shop_admin/manage_index/_switch_banner_activity",
